@@ -52,6 +52,17 @@ public class PrefabLibraryEditor : EditorWindow
         {
             EditorGUILayout.BeginHorizontal();
             prefabLibrary.prefabCategories[i].categoryName = EditorGUILayout.TextField(prefabLibrary.prefabCategories[i].categoryName);
+
+            // Category context menu
+            if (Event.current.type == EventType.ContextClick && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+            {
+                Event.current.Use();
+                GenericMenu categoryMenu = new GenericMenu();
+                categoryMenu.AddItem(new GUIContent("Add Category"), false, AddCategory);
+                categoryMenu.AddItem(new GUIContent("Remove Category"), false, () => RemoveCategory(i));
+                categoryMenu.ShowAsContext();
+            }
+
             EditorGUILayout.EndHorizontal();
 
             for (int j = 0; j < prefabLibrary.prefabCategories[i].prefabs.Count; j++)
@@ -64,7 +75,23 @@ public class PrefabLibraryEditor : EditorWindow
                     prefabSelectionStates[i][j] = EditorGUILayout.Toggle(prefabSelectionStates[i][j], GUILayout.Width(20));
                     EditorGUILayout.LabelField("Prefab " + (j + 1).ToString(), GUILayout.Width(50));
                     prefabLibrary.prefabCategories[i].prefabs[j] = (GameObject)EditorGUILayout.ObjectField(prefabLibrary.prefabCategories[i].prefabs[j], typeof(GameObject), false);
+
+                                        // Prefab context menu
+                    if (Event.current.type == EventType.ContextClick && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+                    {
+                        Event.current.Use();
+                        GenericMenu prefabMenu = new GenericMenu();
+                        prefabMenu.AddItem(new GUIContent("Add Prefab"), false, () => AddPrefab(i));
+                        prefabMenu.AddItem(new GUIContent("Remove Prefab"), false, () => RemovePrefab(i, j));
+                        prefabMenu.AddItem(new GUIContent("Duplicate Prefab"), false, () => DuplicatePrefab(i, j));
+                        prefabMenu.ShowAsContext();
+                    }
+
                     EditorGUILayout.LabelField("Instances: " + CountPrefabInstances(prefabLibrary.prefabCategories[i].prefabs[j]));
+
+                    Texture2D prefabPreview = AssetPreview.GetAssetPreview(prefabLibrary.prefabCategories[i].prefabs[j]);
+                    GUILayout.Box(prefabPreview, GUILayout.Width(50), GUILayout.Height(50));
+
                     EditorGUILayout.EndHorizontal();
                 }
             }
@@ -120,5 +147,33 @@ public class PrefabLibraryEditor : EditorWindow
             }
         }
     }
+
+    // Contextual Menus
+    private void AddPrefab(int categoryIndex)
+    {
+        prefabLibrary.prefabCategories[categoryIndex].prefabs.Add(null);
+    }
+
+    private void RemovePrefab(int categoryIndex, int prefabIndex)
+    {
+        prefabLibrary.prefabCategories[categoryIndex].prefabs.RemoveAt(prefabIndex);
+    }
+
+    private void DuplicatePrefab(int categoryIndex, int prefabIndex)
+    {
+        prefabLibrary.prefabCategories[categoryIndex].prefabs.Add(prefabLibrary.prefabCategories[categoryIndex].prefabs[prefabIndex]);
+    }
+
+    private void AddCategory()
+    {
+        prefabLibrary.prefabCategories.Add(new PrefabCategory());
+    }
+
+    private void RemoveCategory(int categoryIndex)
+    {
+        prefabLibrary.prefabCategories.RemoveAt(categoryIndex);
+    }
 }
+
+
    
