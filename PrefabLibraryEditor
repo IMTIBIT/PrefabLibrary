@@ -8,6 +8,10 @@ public class PrefabLibraryEditor : EditorWindow
     private Vector2 scrollPosition;
     private List<List<bool>> prefabSelectionStates = new List<List<bool>>();
     private string searchQuery = "";
+    private GUIStyle headerStyle;
+    private GUIStyle buttonStyle;
+    private GUIStyle boxStyle;
+
 
     [MenuItem("Window/Prefab Library")]
     public static void ShowWindow()
